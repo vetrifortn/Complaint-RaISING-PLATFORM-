@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Complaint = {
   id: number;
@@ -15,34 +16,71 @@ type Complaint = {
 };
 
 export default function AdminPage() {
+  const router = useRouter();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  async function fetchComplaints(): Promise<Complaint[]> {
+    const response = await fetch("/api/admin/complaints");
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || "Could not load complaints.");
+    }
+
+    return data.complaints;
+  }
 
   async function loadComplaints() {
     setLoading(true);
     setError("");
 
     try {
-      const response = await fetch("/api/admin/complaints");
-      const data = await response.json();
-
-      if (!response.ok || !data.success) {
-        throw new Error(data.message || "Could not load complaints.");
-      }
-
-      setComplaints(data.complaints);
+      setComplaints(await fetchComplaints());
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Something went wrong."
-      );
+      setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setLoading(false);
     }
   }
 
+  async function logout() {
+    const response = await fetch("/api/admin/logout", { method: "POST" });
+
+    if (!response.ok) {
+      setError("Could not log out. Please try again.");
+      return;
+    }
+
+    router.replace("/admin/login");
+    router.refresh();
+  }
+
   useEffect(() => {
-    loadComplaints();
+    let active = true;
+
+    async function loadInitialComplaints() {
+      try {
+        setComplaints(await fetchComplaints());
+      } catch (err) {
+        if (active) {
+          setError(
+            err instanceof Error ? err.message : "Something went wrong."
+          );
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    void loadInitialComplaints();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -53,15 +91,13 @@ export default function AdminPage() {
             <p className="font-semibold text-blue-600">NAMMA TAMIL NADU</p>
             <h1 className="mt-2 text-3xl font-bold text-gray-900">
               Admin Dashboard
-            </h1><button
-  onClick={async () => {
-    await fetch("/api/admin/logout", { method: "POST" });
-    window.location.href = "/admin/login";
-  }}
-  className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
->
-  Logout
-</button>
+            </h1>
+            <button
+              onClick={logout}
+              className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700"
+            >
+              Logout
+            </button>
             <p className="mt-2 text-gray-600">
               Review and manage public complaints.
             </p>

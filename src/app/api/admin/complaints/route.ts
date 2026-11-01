@@ -1,8 +1,16 @@
 import { NextResponse } from "next/server";
+import { verifyAdminSession } from "@/lib/auth";
 import pool from "@/lib/db";
 
 // FETCH ALL COMPLAINTS FOR ADMIN DASHBOARD
 export async function GET() {
+  if (!(await verifyAdminSession())) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized." },
+      { status: 401 }
+    );
+  }
+
   try {
     const result = await pool.query(
       `SELECT

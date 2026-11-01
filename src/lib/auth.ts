@@ -1,20 +1,22 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-const secret = process.env.AUTH_SECRET;
+function getSecretKey() {
+  const secret = process.env.AUTH_SECRET;
 
-if (!secret) {
-  throw new Error("AUTH_SECRET is missing from .env.local");
+  if (!secret) {
+    throw new Error("AUTH_SECRET environment variable is required.");
+  }
+
+  return new TextEncoder().encode(secret);
 }
-
-const secretKey = new TextEncoder().encode(secret);
 
 export async function createAdminSession() {
   const token = await new SignJWT({ role: "admin" })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("2h")
-    .sign(secretKey);
+    .sign(getSecretKey());
 
   const cookieStore = await cookies();
 
@@ -34,6 +36,8 @@ export async function verifyAdminSession() {
   if (!token) {
     return false;
   }
+
+  const secretKey = getSecretKey();
 
   try {
     const { payload } = await jwtVerify(token, secretKey);
