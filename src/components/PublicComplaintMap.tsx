@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,7 +9,6 @@ import {
   Popup,
   useMap,
 } from "react-leaflet";
-
 import L from "leaflet";
 
 type Complaint = {
@@ -21,6 +21,15 @@ type Complaint = {
   longitude: number;
   status: string;
 };
+
+const categories = [
+  "All",
+  "Waste & Garbage",
+  "Water Problems",
+  "Air Pollution",
+  "Public Issues",
+];
+
 function getCategoryIcon(category: string) {
   const colors: Record<string, string> = {
     "Waste & Garbage": "#ef4444",
@@ -45,7 +54,12 @@ function getCategoryIcon(category: string) {
     iconAnchor: [11, 11],
   });
 }
-function FitMapToComplaints({ complaints }: { complaints: Complaint[] }) {
+
+function FitMapToComplaints({
+  complaints,
+}: {
+  complaints: Complaint[];
+}) {
   const map = useMap();
 
   useEffect(() => {
@@ -70,12 +84,13 @@ export default function PublicComplaintMap() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const filteredComplaints =
-  selectedCategory === "All"
-    ? complaints
-    : complaints.filter(
-        (complaint) => complaint.category === selectedCategory
-      );
+    selectedCategory === "All"
+      ? complaints
+      : complaints.filter(
+          (complaint) => complaint.category === selectedCategory
+        );
 
   useEffect(() => {
     async function fetchComplaints() {
@@ -99,40 +114,42 @@ export default function PublicComplaintMap() {
   }, []);
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="mb-5 flex flex-wrap justify-center gap-3">
-  {[
-    "All",
-    "Waste & Garbage",
-    "Water Problems",
-    "Air Pollution",
-    "Public Issues",
-  ].map((category) => (
-    <button
-      key={category}
-      onClick={() => setSelectedCategory(category)}
-      className={`rounded-full px-4 py-2 text-sm font-medium transition ${
-        selectedCategory === category
-          ? "bg-blue-600 text-white"
-          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-      }`}
-    >
-      {category === "All" ? "All Complaints" : category}
-    </button>
-  ))}
-</div>
-      <div className="mb-6 text-center">
-        <h2 className="text-3xl font-bold text-gray-900">
+    <section className="mx-auto max-w-7xl px-6 py-16 sm:py-20">
+      <div className="mb-8 text-center">
+        <p className="mb-3 text-sm font-bold uppercase tracking-widest text-green-700">
+          Explore Your Community
+        </p>
+
+        <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
           Public Complaint Map
         </h2>
 
-        <p className="mt-2 text-gray-600">
-          Explore reported public problems across Tamil Nadu.
+        <p className="mx-auto mt-3 max-w-2xl leading-7 text-gray-600">
+          Explore reported public problems across Tamil Nadu and see
+          where communities need attention.
         </p>
       </div>
 
+      <div className="mb-6 flex flex-wrap justify-center gap-3">
+        {categories.map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition ${
+              selectedCategory === category
+                ? "border-green-700 bg-green-700 text-white shadow-md"
+                : "border-gray-200 bg-white text-gray-700 hover:border-green-500 hover:bg-green-50"
+            }`}
+          >
+            {category === "All" ? "All Complaints" : category}
+          </button>
+        ))}
+      </div>
+
       {loading && (
-        <p className="py-8 text-center">Loading complaints...</p>
+        <p className="py-8 text-center text-gray-600">
+          Loading complaints...
+        </p>
       )}
 
       {error && (
@@ -141,57 +158,70 @@ export default function PublicComplaintMap() {
 
       {!loading && !error && (
         <>
-          <p className="mb-3 text-sm text-gray-600">
-            {filteredComplaints.length} complaint(s) with map locations
-          </p>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm font-medium text-gray-600">
+              Showing{" "}
+              <span className="font-bold text-green-700">
+                {filteredComplaints.length}
+              </span>{" "}
+              complaint(s) with map locations
+            </p>
 
-          <div className="overflow-hidden rounded-xl border border-gray-300">
-            <MapContainer
-              center={[10.7905, 78.7047]}
-              zoom={7}
-              scrollWheelZoom={true}
-              style={{ height: "500px", width: "100%" }}
+            <span className="rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-800">
+              {selectedCategory === "All"
+                ? "All categories"
+                : selectedCategory}
+            </span>
+          </div>
 
-            ><FitMapToComplaints complaints={complaints} />
-              <TileLayer
-                attribution="&copy; OpenStreetMap contributors"
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+          <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white p-2 shadow-lg">
+            <div className="overflow-hidden rounded-xl">
+              <MapContainer
+                center={[10.7905, 78.7047]}
+                zoom={7}
+                scrollWheelZoom={true}
+                style={{ height: "500px", width: "100%" }}
+              >
+                <FitMapToComplaints complaints={filteredComplaints} />
 
-              {filteredComplaints.map((complaint) => (
-                <Marker
-  key={complaint.id}
-  position={[
-    complaint.latitude,
-    complaint.longitude,
-  ]}
-  icon={getCategoryIcon(complaint.category)}
->
-                  <Popup>
-                    <div className="min-w-48">
-                      <h3 className="font-bold">
-                        {complaint.title}
-                      </h3>
+                <TileLayer
+                  attribution="&copy; OpenStreetMap contributors"
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
 
-                      <p className="mt-1">
-                        Category: {complaint.category}
-                      </p>
+                {filteredComplaints.map((complaint) => (
+                  <Marker
+                    key={complaint.id}
+                    position={[
+                      complaint.latitude,
+                      complaint.longitude,
+                    ]}
+                    icon={getCategoryIcon(complaint.category)}
+                  >
+                    <Popup>
+                      <div className="min-w-48">
+                        <h3 className="font-bold">{complaint.title}</h3>
 
-                      <p>Location: {complaint.location}</p>
+                        <p className="mt-1">
+                          Category: {complaint.category}
+                        </p>
 
-                      <p>Status: {complaint.status}</p>
+                        <p>Location: {complaint.location}</p>
+                        <p>Status: {complaint.status}</p>
 
-                      <p className="mt-2 text-sm">
-                        {complaint.description}
-                      </p>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
-            </MapContainer>
+                        <p className="mt-2 text-sm">
+                          {complaint.description}
+                        </p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            </div>
           </div>
         </>
       )}
     </section>
   );
 }
+

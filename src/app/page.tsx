@@ -130,70 +130,48 @@ export default function Home() {
           </nav>
         </div>
       </header>
-
       {/* Hero section */}
       <section
         id="home"
-        className="bg-gradient-to-br from-green-900 to-green-700 text-white"
+        className="relative overflow-hidden bg-gradient-to-br from-green-950 via-green-800 to-green-700 text-white"
       >
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:py-28">
-          <p className="mb-4 font-semibold uppercase tracking-widest text-green-200">
-            Your Voice. Your Community.
-          </p>
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:py-20 lg:py-24">
+          <div className="max-w-3xl">
+            <p className="mb-4 inline-block rounded-full border border-green-300/30 bg-white/10 px-4 py-2 text-sm font-semibold uppercase tracking-widest text-green-100">
+              Your Voice. Your Community.
+            </p>
 
-          <h1 className="max-w-3xl text-4xl font-bold leading-tight sm:text-6xl">
-            Together, We Can Improve Tamil Nadu
-          </h1>
+            <h1 className="text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+              Together, We Can Improve{" "}
+              <span className="text-green-300">Tamil Nadu</span>
+            </h1>
 
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-green-50">
-            Report public problems in your area and help bring attention to
-            the issues that matter to your community.
-          </p>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-green-50 sm:text-lg sm:leading-8">
+              Report public problems in your area, share their location, and
+              help bring attention to the issues that matter to your community.
+            </p>
 
-          <a
-            href="#report"
-            className="mt-8 inline-block rounded-lg bg-white px-7 py-3 font-semibold text-green-900 transition hover:bg-green-50"
-          >
-            Report a Problem
-          </a>
+            <a
+              href="#report"
+              className="mt-8 inline-flex items-center rounded-lg bg-white px-7 py-3.5 font-semibold text-green-900 shadow-lg transition hover:-translate-y-1 hover:bg-green-50"
+            >
+              Report a Problem →
+            </a>
+          </div>
         </div>
+
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full border border-white/10"
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full border border-white/10"
+        />
       </section>
+
       <PublicComplaintMap />
       <ComplaintStatusHistory />
-
-      {/* Categories */}
-      <section id="categories" className="mx-auto max-w-7xl px-6 py-16">
-        <div className="mb-10">
-          <p className="font-semibold text-green-700">ISSUE CATEGORIES</p>
-          <h2 className="mt-2 text-3xl font-bold sm:text-4xl">
-            What needs to be fixed?
-          </h2>
-          <p className="mt-3 max-w-2xl text-slate-600">
-            Choose the type of public problem you want to report.
-          </p>
-        </div>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {categories.map((category) => (
-            <a
-              key={category.name}
-              href="#report"
-              className="rounded-xl border border-slate-200 bg-white p-6 transition hover:-translate-y-1 hover:border-green-600 hover:shadow-lg"
-            >
-              <span className="text-4xl" aria-hidden="true">
-                {category.icon}
-              </span>
-
-              <h3 className="mt-4 text-lg font-bold">{category.name}</h3>
-
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                {category.description}
-              </p>
-            </a>
-          ))}
-        </div>
-      </section>
-
       {/* Complaint form */}
       <section id="report" className="bg-white py-16">
         <div className="mx-auto max-w-3xl px-6">

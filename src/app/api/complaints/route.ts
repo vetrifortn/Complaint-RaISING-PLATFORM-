@@ -101,14 +101,6 @@ export async function POST(request: Request) {
 
 // FETCH COMPLAINTS
 export async function GET() {
-  const isAuthenticated = await verifyAdminSession();
-
-if (!isAuthenticated) {
-  return Response.json(
-    { success: false, message: "Unauthorized" },
-    { status: 401 }
-  );
-}
   try {
     const result = await pool.query(
       `SELECT id, title, category, description, location,
@@ -135,7 +127,6 @@ if (!isAuthenticated) {
     );
   }
 }
-
 // UPDATE COMPLAINT STATUS
 export async function PUT(request: Request) {
   const isAuthenticated = await verifyAdminSession();
